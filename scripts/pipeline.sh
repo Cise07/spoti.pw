@@ -83,9 +83,24 @@ echo "    $TWEAK_DEB"
 FILES=("$TWEAK_DEB")
 [ "$WITH_FLEX" = 1 ] && FILES+=("$FLEX_DEB")
 
+if xcrun --sdk iphoneos --find swiftc >/dev/null 2>&1; then
+  EXT_DIR="$ROOT/out/extension"
+  unzip -p "$IN" "${APP_DIR}Info.plist" > "$ROOT/out/.info.plist"
+  "$ROOT/scripts/build-extension.sh" "$ROOT/out/.info.plist" "$EXT_DIR"
+  rm -f "$ROOT/out/.info.plist"
+  FILES+=("$EXT_DIR/SpotifyGlassLiveActivity.appex")
+else
+  echo "==> no Xcode selected: building without the Live Activity extension"
+fi
+
 echo "==> injecting"
 # -w drops the Watch app: its companion-app key would still name com.spotify.client and block the install.
 cyan -i "$IN" -o "$OUT" -f "${FILES[@]}" -l "$ROOT/plist/liquid-glass.plist" ${BUNDLE_ID:+-b "$BUNDLE_ID"} ${NAME:+-n "$NAME"} ${ICON:+-k "$ICON"} -w -s --overwrite
+
+if [ -n "${EXT_DIR:-}" ]; then
+  echo "==> adding the Live Activity intents to Spotify's App Intents metadata"
+  "$ROOT/scripts/merge-appintents.py" "$OUT" "$APP_DIR" "$EXT_DIR/app/Metadata.appintents"
+fi
 
 echo "==> done: $OUT"
 [ "$INSTALL" = 1 ] && exec "$ROOT/scripts/install.sh" "$OUT"

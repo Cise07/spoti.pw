@@ -6,6 +6,7 @@
 #import "Features/ArtistBlock/ArtistBlock.h"
 #import "Features/Karaoke/Karaoke.h"
 #import "Features/LockScreenLyrics/LockScreenLyrics.h"
+#import "Features/ControlPanel/ControlPanel.h"
 
 static UIViewController *nowPlayingBarPage(void) {
     return [[SGModPage alloc] initWithTitle:@"Now playing bar" intro:SGRestartNote sections:@[
@@ -91,6 +92,9 @@ UIViewController *SGNowPlayingSettingsPage(void) {
             SGWithSymbol(blocked, @"person.crop.circle.badge.xmark"),
             SGWithSymbol(SGPageRow(@"Now playing bar", ^UIViewController *{ return nowPlayingBarPage(); }), @"rectangle.bottomthird.inset.filled"),
         ]),
+        SGNotedSection(@"Live Activity", @[
+            SGOptionRow(@"Control panel mockup", @"Controls, queue, devices and a sleep timer on the lock screen", SGKeyControlPanel),
+        ], @"Made-up data for now: the taps change the panel, not Spotify."),
         SGNotedSection(@"Player screen", @[
             SGOptionRow(@"Artwork background", @"The cover blurred and dimmed behind the player instead of the flat album colour", SGKeyPlayerBackdrop),
             SGOptionRow(@"Glass header buttons", @"Glass circles behind close and more, over the artwork", SGKeyPlayer),
